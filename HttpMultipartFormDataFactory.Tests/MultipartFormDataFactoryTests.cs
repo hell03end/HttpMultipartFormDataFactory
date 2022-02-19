@@ -11,12 +11,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace HttpMultipartFormDataFactory.Tests;
 
 [TestClass]
-public class HttpMultipartFormDataFactoryTests
+public class MultipartFormDataFactoryTests
 {
     private static CancellationToken Token { get; } = CancellationToken.None;
 
-    private static HttpMultipartFormDataFactory HttpMultipartFormDataFactory { get; } =
-        HttpMultipartFormDataFactory.Default;
+    private static MultipartFormDataFactory MultipartFormDataFactory { get; } = MultipartFormDataFactory.Default;
 
     private static IFormFile File { get; } =
         new FormFile(new MemoryStream(Encoding.Default.GetBytes("test")), 0, 4, "file", "file.txt")
@@ -60,7 +59,7 @@ public class HttpMultipartFormDataFactoryTests
             Null,
         };
 
-        var content = await HttpMultipartFormDataFactory.Create(request, Token);
+        var content = await MultipartFormDataFactory.Create(request, Token);
 
         Assert.IsNotNull(content);
         Assert.IsTrue(!content.Any()); // null values should be filtered
@@ -74,7 +73,7 @@ public class HttpMultipartFormDataFactoryTests
             File,
         };
 
-        var content = await HttpMultipartFormDataFactory.Create(request, Token);
+        var content = await MultipartFormDataFactory.Create(request, Token);
 
         Assert.IsNotNull(content);
         Assert.IsTrue(content.Any());
@@ -89,7 +88,7 @@ public class HttpMultipartFormDataFactoryTests
             Files,
         };
 
-        var content = await HttpMultipartFormDataFactory.Create(request, Token);
+        var content = await MultipartFormDataFactory.Create(request, Token);
 
         Assert.IsNotNull(content);
         Assert.IsTrue(content.Any());
@@ -113,7 +112,7 @@ public class HttpMultipartFormDataFactoryTests
             Decimal,
         };
 
-        var content = await HttpMultipartFormDataFactory.Create(request, Token);
+        var content = await MultipartFormDataFactory.Create(request, Token);
 
         Assert.IsNotNull(content);
         Assert.IsTrue(content.Any());
@@ -141,7 +140,7 @@ public class HttpMultipartFormDataFactoryTests
             Decimals,
         };
 
-        var content = await HttpMultipartFormDataFactory.Create(request, Token);
+        var content = await MultipartFormDataFactory.Create(request, Token);
 
         Assert.IsNotNull(content);
         Assert.IsTrue(content.Any());
@@ -182,7 +181,7 @@ public class HttpMultipartFormDataFactoryTests
             Decimals,
         };
 
-        var content = await HttpMultipartFormDataFactory.Create(request, Token);
+        var content = await MultipartFormDataFactory.Create(request, Token);
 
         Assert.IsNotNull(content);
         Assert.IsTrue(content.Any());

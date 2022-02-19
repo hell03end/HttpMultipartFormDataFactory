@@ -1,6 +1,6 @@
 namespace HttpMultipartFormDataFactory.Models;
 
-public struct FieldData
+internal struct FieldData
 {
     public HttpContent? Value { get; set; }
 

@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace HttpMultipartFormDataFactory.Models;
 
-public struct PropertyData
+internal struct PropertyData
 {
     public PropertyInfo? PropertyInfo { get; set; }
 

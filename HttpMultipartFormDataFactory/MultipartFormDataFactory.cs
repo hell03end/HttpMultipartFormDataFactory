@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Http;
 
 namespace HttpMultipartFormDataFactory;
 
-public class HttpMultipartFormDataFactory
+public class MultipartFormDataFactory
 {
     private ConcurrentDictionary<Type, PropertyData[]> PropertiesCache { get; } = new();
 
-    public static HttpMultipartFormDataFactory Default => new();
+    public static MultipartFormDataFactory Default => new();
 
     /// <summary>
     /// Creates MultipartFormDataContent
