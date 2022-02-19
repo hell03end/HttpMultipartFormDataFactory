@@ -1,7 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <Description>A small library for creating multipart/form-data content from flat stucture objects.</Description>
+        <Authors>Dmitry Pchelkin</Authors>
         <TargetFramework>netstandard2.0</TargetFramework>
+        <AssemblyName>HttpMultipartFormDataFactory</AssemblyName>
+        <PackageId>HttpMultipartFormDataFactory</PackageId>
+        <PackageTags>Multipart;Form Data;Http</PackageTags>
+        <PackageReleaseNotes>https://github.com/hell03end/HttpMultipartFormDataFactory/releases</PackageReleaseNotes>
+        <PackageProjectUrl>https://github.com/hell03end/HttpMultipartFormDataFactory/</PackageProjectUrl>
+        <Version>0.1.0</Version>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
