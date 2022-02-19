@@ -1,6 +1,9 @@
 # HttpMultipartFormDataFactory
 
-A small library for creating multipart/form-data content from flat stucture objects.
+[![build](https://github.com/hell03end/HttpMultipartFormDataFactory/actions/workflows/build.yml/badge.svg)](https://github.com/hell03end/HttpMultipartFormDataFactory/actions/workflows/build.yml)
+[![NuGet version](https://badge.fury.io/nu/HttpMultipartFormDataFactory.svg)](https://badge.fury.io/nu/HttpMultipartFormDataFactory)
+
+A small library for creating multipart/form-data content from flat structure objects.
 
 This project is licensed under the [MIT license](LICENSE).
 
