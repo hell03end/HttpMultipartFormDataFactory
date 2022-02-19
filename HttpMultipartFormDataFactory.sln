@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpMultipartFormDataFactory", "HttpMultipartFormDataFactory\HttpMultipartFormDataFactory.csproj", "{32D8603B-A834-4540-9756-3AE01AFBC77A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{73D3ADAD-2901-41AB-87CC-5C8CB5D1A489}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F4181B08-2F14-4D3C-AD24-6ECF390CCE56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpMultipartFormDataFactory.Tests", "HttpMultipartFormDataFactory.Tests\HttpMultipartFormDataFactory.Tests.csproj", "{A4A565D9-07B8-49F0-A7C6-C87F4CBF09A7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{32D8603B-A834-4540-9756-3AE01AFBC77A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32D8603B-A834-4540-9756-3AE01AFBC77A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32D8603B-A834-4540-9756-3AE01AFBC77A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32D8603B-A834-4540-9756-3AE01AFBC77A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4A565D9-07B8-49F0-A7C6-C87F4CBF09A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4A565D9-07B8-49F0-A7C6-C87F4CBF09A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4A565D9-07B8-49F0-A7C6-C87F4CBF09A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4A565D9-07B8-49F0-A7C6-C87F4CBF09A7}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{32D8603B-A834-4540-9756-3AE01AFBC77A} = {73D3ADAD-2901-41AB-87CC-5C8CB5D1A489}
+		{A4A565D9-07B8-49F0-A7C6-C87F4CBF09A7} = {F4181B08-2F14-4D3C-AD24-6ECF390CCE56}
+	EndGlobalSection
+EndGlobal
