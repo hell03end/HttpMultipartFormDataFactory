@@ -195,4 +195,44 @@ public class MultipartFormDataFactoryTests
 
         Assert.IsFalse(content.Any(x => x.Headers.Any(h => h.Value.First().Contains($"name={nameof(Null)}"))));
     }
+
+    [TestMethod]
+    public async Task MultipartDataContentWithCacheNotFail()
+    {
+        var multipartFormDataFactory = new MultipartFormDataFactory(true);
+        var request = new
+        {
+            File,
+        };
+
+        var results =
+            await Task.WhenAll(Enumerable.Range(0, 10).Select(_ => multipartFormDataFactory.Create(request, Token)));
+
+        foreach (var content in results)
+        {
+            Assert.IsNotNull(content);
+            Assert.IsTrue(content.Any());
+            Assert.IsTrue(content.Any(x => x.Headers.Any(h => h.Value.First().Contains($"name={nameof(File)}"))));
+        }
+    }
+
+    [TestMethod]
+    public async Task MultipartDataContentWithoutCacheNotFail()
+    {
+        var multipartFormDataFactory = new MultipartFormDataFactory(false);
+        var request = new
+        {
+            File,
+        };
+
+        var results =
+            await Task.WhenAll(Enumerable.Range(0, 10).Select(_ => multipartFormDataFactory.Create(request, Token)));
+
+        foreach (var content in results)
+        {
+            Assert.IsNotNull(content);
+            Assert.IsTrue(content.Any());
+            Assert.IsTrue(content.Any(x => x.Headers.Any(h => h.Value.First().Contains($"name={nameof(File)}"))));
+        }
+    }
 }

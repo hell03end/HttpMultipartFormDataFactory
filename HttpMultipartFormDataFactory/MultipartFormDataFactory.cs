@@ -7,7 +7,14 @@ namespace HttpMultipartFormDataFactory;
 
 public class MultipartFormDataFactory
 {
-    private ConcurrentDictionary<Type, PropertyData[]> PropertiesCache { get; } = new();
+    private ConcurrentDictionary<Type, PropertyData[]>? PropertiesCache { get; }
+
+    public MultipartFormDataFactory(bool useCache = true)
+    {
+        PropertiesCache = useCache
+            ? new ConcurrentDictionary<Type, PropertyData[]>()
+            : null;
+    }
 
     public static MultipartFormDataFactory Default => new();
 
@@ -18,43 +25,15 @@ public class MultipartFormDataFactory
     /// <param name="token">Cancellation token</param>
     /// <typeparam name="T">Type of request DTO</typeparam>
     /// <returns>Filled MultipartFormDataContent</returns>
-    public async Task<MultipartFormDataContent> Create<T>(T request, CancellationToken token) =>
-        await Create(request, token, PropertiesCache);
-
-    private static async Task<MultipartFormDataContent> Create<T>(
-        T request,
-        CancellationToken token,
-        ConcurrentDictionary<Type, PropertyData[]> propertiesCache)
+    public async Task<MultipartFormDataContent> Create<T>(T request, CancellationToken token)
     {
-        var requestType = typeof(T);
-        if (!propertiesCache.TryGetValue(requestType, out var properties))
-        {
-            properties = requestType.GetProperties()
-                .Select(x => new PropertyData
-                {
-                    PropertyInfo = x,
-                    IsFile = typeof(IFormFile).IsAssignableFrom(x.PropertyType),
-                    IsCollection = x.PropertyType.GetInterfaces()
-                                       .Any(y => y.IsGenericType &&
-                                                 y.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                                   && !typeof(string).IsAssignableFrom(x.PropertyType),
-                    Name = x.Name,
-                })
-                .ToArray();
-
-            propertiesCache.TryAdd(requestType, properties);
-        }
+        var properties = GetPropertiesData<T>();
 
         var requestData = new List<FieldData>();
-        var propsMap = properties.ToDictionary(x => x, x => x.PropertyInfo?.GetValue(request));
+        var propsMap = properties.ToDictionary(x => x, x => x.PropertyInfo.GetValue(request));
 
-        foreach (var item in propsMap)
+        foreach (var item in propsMap.Where(item => item.Value is not null))
         {
-            if (item.Value is null)
-            {
-                continue;
-            }
-
             if (item.Key.IsFile)
             {
                 if (item.Value is not IFormFile val)
@@ -74,34 +53,34 @@ public class MultipartFormDataFactory
                         await AddFormFilesData(val, item.Key.Name, requestData, token);
                         break;
                     case object[] val:
-                        AddMultipleRequestData(val, item.Key.Name, requestData);
+                        AddMultipleStringData(val, item.Key.Name, requestData);
                         break;
                     case int[] val:
-                        AddMultipleRequestData(val, item.Key.Name, requestData);
+                        AddMultipleStringData(val, item.Key.Name, requestData);
                         break;
                     case long[] val:
-                        AddMultipleRequestData(val, item.Key.Name, requestData);
+                        AddMultipleStringData(val, item.Key.Name, requestData);
                         break;
                     case double[] val:
-                        AddMultipleRequestData(val, item.Key.Name, requestData);
+                        AddMultipleStringData(val, item.Key.Name, requestData);
                         break;
                     case float[] val:
-                        AddMultipleRequestData(val, item.Key.Name, requestData);
+                        AddMultipleStringData(val, item.Key.Name, requestData);
                         break;
                     case bool[] val:
-                        AddMultipleRequestData(val, item.Key.Name, requestData);
+                        AddMultipleStringData(val, item.Key.Name, requestData);
                         break;
                     case decimal[] val:
-                        AddMultipleRequestData(val, item.Key.Name, requestData);
+                        AddMultipleStringData(val, item.Key.Name, requestData);
                         break;
                     case byte[] val:
-                        AddMultipleRequestData(val, item.Key.Name, requestData);
+                        AddMultipleStringData(val, item.Key.Name, requestData);
                         break;
                     case char[] val:
-                        AddMultipleRequestData(val, item.Key.Name, requestData);
+                        AddMultipleStringData(val, item.Key.Name, requestData);
                         break;
                     case short[] val:
-                        AddMultipleRequestData(val, item.Key.Name, requestData);
+                        AddMultipleStringData(val, item.Key.Name, requestData);
                         break;
                 }
             }
@@ -127,9 +106,38 @@ public class MultipartFormDataFactory
         return content;
     }
 
+    #region Private
+
+    private PropertyData[] GetPropertiesData<T>()
+    {
+        var requestType = typeof(T);
+
+        if (PropertiesCache?.TryGetValue(requestType, out var properties) ?? false)
+        {
+            return properties ?? Array.Empty<PropertyData>();
+        }
+
+        properties = requestType.GetProperties()
+            .Select(x => new PropertyData
+            {
+                PropertyInfo = x,
+                IsFile = typeof(IFormFile).IsAssignableFrom(x.PropertyType),
+                IsCollection = x.PropertyType.GetInterfaces()
+                                   .Any(y => y.IsGenericType &&
+                                             y.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                               && !typeof(string).IsAssignableFrom(x.PropertyType),
+                Name = x.Name,
+            })
+            .ToArray();
+
+        PropertiesCache?.TryAdd(requestType, properties);
+
+        return properties;
+    }
+
     private static async Task AddFormFilesData<T>(
         IEnumerable<T> value,
-        string? paramName,
+        string paramName,
         List<FieldData> requestData,
         CancellationToken token)
     {
@@ -149,7 +157,7 @@ public class MultipartFormDataFactory
 
     private static async Task<FieldData> GetStreamContentField(
         IFormFile file,
-        string? paramName,
+        string paramName,
         CancellationToken token)
     {
         var stream = new MemoryStream();
@@ -170,7 +178,7 @@ public class MultipartFormDataFactory
         };
     }
 
-    private static FieldData GetStringContentField<T>(T value, string? paramName)
+    private static FieldData GetStringContentField<T>(T value, string paramName)
     {
         var data = value?.ToString() ?? string.Empty;
 
@@ -185,7 +193,7 @@ public class MultipartFormDataFactory
         };
     }
 
-    private static void AddMultipleRequestData<T>(IEnumerable<T>? value, string? paramName, List<FieldData> requestData)
+    private static void AddMultipleStringData<T>(IEnumerable<T>? value, string paramName, List<FieldData> requestData)
     {
         var values = value as T[] ?? value?.ToArray() ?? Array.Empty<T>();
         if (!values.Any())
@@ -200,4 +208,6 @@ public class MultipartFormDataFactory
             requestData.AddRange(data);
         }
     }
+
+    #endregion
 }
