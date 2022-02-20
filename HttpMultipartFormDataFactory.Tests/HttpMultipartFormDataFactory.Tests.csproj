@@ -2,12 +2,16 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <AssemblyName>HttpMultipartFormDataFactory.Tests</AssemblyName>
+        <PackageId>HttpMultipartFormDataFactory.Tests</PackageId>
+        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+        <StartupObject>HttpMultipartFormDataFactory.Tests.Benchmarks.Program</StartupObject>
         <Nullable>enable</Nullable>
-
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="BenchmarkDotNet" Version="0.13.1" />
         <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
         <PackageReference Include="MSTest.TestAdapter" Version="2.2.7" />
