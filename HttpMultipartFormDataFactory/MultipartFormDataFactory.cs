@@ -52,9 +52,6 @@ public class MultipartFormDataFactory
                     case IFormFile[] val:
                         await AddFormFilesData(val, item.Key.Name, requestData, token);
                         break;
-                    case object[] val:
-                        AddMultipleStringData(val, item.Key.Name, requestData);
-                        break;
                     case int[] val:
                         AddMultipleStringData(val, item.Key.Name, requestData);
                         break;
@@ -82,6 +79,17 @@ public class MultipartFormDataFactory
                     case short[] val:
                         AddMultipleStringData(val, item.Key.Name, requestData);
                         break;
+                    case Guid[] val:
+                        AddMultipleStringData(val, item.Key.Name, requestData);
+                        break;
+                    case DateTimeOffset[] val:
+                        AddMultipleStringData(val, item.Key.Name, requestData);
+                        break;
+                    case object[] val:
+                        AddMultipleStringData(val, item.Key.Name, requestData);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(item.Value), item.Value, "Value is not supported");
                 }
             }
             else

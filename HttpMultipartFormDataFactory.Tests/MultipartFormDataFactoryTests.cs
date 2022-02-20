@@ -1,11 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace HttpMultipartFormDataFactory.Tests;
@@ -17,46 +14,12 @@ public class MultipartFormDataFactoryTests
 
     private static MultipartFormDataFactory MultipartFormDataFactory { get; } = MultipartFormDataFactory.Default;
 
-    private static IFormFile File { get; } =
-        new FormFile(new MemoryStream(Encoding.Default.GetBytes("test")), 0, 4, "file", "file.txt")
-        {
-            Headers = new HeaderDictionary(),
-            ContentType = "text/plain",
-            ContentDisposition = "form-data; name=\"File\"; filename=\"file.txt\"",
-        };
-
-    #region TestValues
-
-    private const object Null = null!;
-    private const string String = "string";
-    private const long Long = long.MaxValue;
-    private const int Int = int.MaxValue;
-    private const char Char = char.MaxValue;
-    private const bool Bool = true;
-    private const float Float = float.MaxValue;
-    private const double Double = double.MaxValue;
-    private const byte Byte = byte.MaxValue;
-    private const decimal Decimal = decimal.MaxValue;
-
-    private static readonly IFormFile[] Files = { File, File, File, };
-    private static readonly string[] Strings = { String, String, String, };
-    private static readonly long[] Longs = { Long, Long, Long, };
-    private static readonly int[] Ints = { Int, Int, Int, };
-    private static readonly char[] Chars = { Char, Char, Char, };
-    private static readonly bool[] Bools = { Bool, Bool, Bool, };
-    private static readonly float[] Floats = { Float, Float, Float, };
-    private static readonly double[] Doubles = { Double, Double, Double, };
-    private static readonly byte[] Bytes = { Byte, Byte, Byte, };
-    private static readonly decimal[] Decimals = { Decimal, Decimal, Decimal, };
-
-    #endregion TestValues
-
     [TestMethod]
     public async Task MultipartDataContentCreatedNull()
     {
         var request = new
         {
-            Null,
+            TestValues.Null,
         };
 
         var content = await MultipartFormDataFactory.Create(request, Token);
@@ -70,7 +33,7 @@ public class MultipartFormDataFactoryTests
     {
         var request = new
         {
-            File,
+            TestValues.File,
         };
 
         var content = await MultipartFormDataFactory.Create(request, Token);
@@ -85,7 +48,7 @@ public class MultipartFormDataFactoryTests
     {
         var request = new
         {
-            Files,
+            TestValues.Files,
         };
 
         var content = await MultipartFormDataFactory.Create(request, Token);
@@ -100,16 +63,18 @@ public class MultipartFormDataFactoryTests
     {
         var request = new
         {
-            String,
-            EmptyString = string.Empty,
-            Long,
-            Int,
-            Char,
-            Bool,
-            Float,
-            Double,
-            Byte,
-            Decimal,
+            TestValues.String,
+            TestValues.EmptyString,
+            TestValues.Long,
+            TestValues.Int,
+            TestValues.Char,
+            TestValues.Bool,
+            TestValues.Float,
+            TestValues.Double,
+            TestValues.Byte,
+            TestValues.Decimal,
+            TestValues.Guid,
+            TestValues.DateTimeOffset,
         };
 
         var content = await MultipartFormDataFactory.Create(request, Token);
@@ -129,15 +94,19 @@ public class MultipartFormDataFactoryTests
     {
         var request = new
         {
-            Strings,
-            Longs,
-            Ints,
-            Chars,
-            Bools,
-            Floats,
-            Doubles,
-            Bytes,
-            Decimals,
+            TestValues.Strings,
+            TestValues.Longs,
+            TestValues.Ints,
+            TestValues.Chars,
+            TestValues.Bools,
+            TestValues.Floats,
+            TestValues.Doubles,
+            TestValues.Bytes,
+            TestValues.Decimals,
+            TestValues.Guids,
+            TestValues.DateTimeOffsets,
+            TestValues.EmptyStrings,
+            TestValues.Nulls,
         };
 
         var content = await MultipartFormDataFactory.Create(request, Token);
@@ -157,28 +126,34 @@ public class MultipartFormDataFactoryTests
     {
         var request = new
         {
-            Null,
-            File,
-            Files,
-            String,
-            EmptyString = string.Empty,
-            Long,
-            Int,
-            Char,
-            Bool,
-            Float,
-            Double,
-            Byte,
-            Decimal,
-            Strings,
-            Longs,
-            Ints,
-            Chars,
-            Bools,
-            Floats,
-            Doubles,
-            Bytes,
-            Decimals,
+            TestValues.Null,
+            TestValues.File,
+            TestValues.Files,
+            TestValues.String,
+            TestValues.EmptyString,
+            TestValues.Long,
+            TestValues.Int,
+            TestValues.Char,
+            TestValues.Bool,
+            TestValues.Float,
+            TestValues.Double,
+            TestValues.Byte,
+            TestValues.Decimal,
+            TestValues.Guid,
+            TestValues.DateTimeOffset,
+            TestValues.Nulls,
+            TestValues.Strings,
+            TestValues.Longs,
+            TestValues.Ints,
+            TestValues.Chars,
+            TestValues.Bools,
+            TestValues.Floats,
+            TestValues.Doubles,
+            TestValues.Bytes,
+            TestValues.Decimals,
+            TestValues.Guids,
+            TestValues.DateTimeOffsets,
+            TestValues.EmptyStrings,
         };
 
         var content = await MultipartFormDataFactory.Create(request, Token);
@@ -188,21 +163,46 @@ public class MultipartFormDataFactoryTests
 
         var names = request.GetType().GetProperties()
             .Select(x => x.Name)
-            .Where(x => !x.Equals(nameof(Null), StringComparison.OrdinalIgnoreCase))
+            .Where(x => !x.Equals(nameof(TestValues.Null), StringComparison.OrdinalIgnoreCase))
             .ToArray();
 
         Assert.IsTrue(names.All(n => content.Any(x => x.Headers.Any(h => h.Value.First().Contains($"name={n}")))));
-
-        Assert.IsFalse(content.Any(x => x.Headers.Any(h => h.Value.First().Contains($"name={nameof(Null)}"))));
     }
 
     [TestMethod]
     public async Task MultipartDataContentWithCacheNotFail()
     {
-        var multipartFormDataFactory = new MultipartFormDataFactory(true);
+        var multipartFormDataFactory = new MultipartFormDataFactory();
         var request = new
         {
-            File,
+            TestValues.Null,
+            TestValues.File,
+            TestValues.Files,
+            TestValues.String,
+            TestValues.EmptyString,
+            TestValues.Long,
+            TestValues.Int,
+            TestValues.Char,
+            TestValues.Bool,
+            TestValues.Float,
+            TestValues.Double,
+            TestValues.Byte,
+            TestValues.Decimal,
+            TestValues.Guid,
+            TestValues.DateTimeOffset,
+            TestValues.Nulls,
+            TestValues.Strings,
+            TestValues.Longs,
+            TestValues.Ints,
+            TestValues.Chars,
+            TestValues.Bools,
+            TestValues.Floats,
+            TestValues.Doubles,
+            TestValues.Bytes,
+            TestValues.Decimals,
+            TestValues.Guids,
+            TestValues.DateTimeOffsets,
+            TestValues.EmptyStrings,
         };
 
         var results =
@@ -222,7 +222,34 @@ public class MultipartFormDataFactoryTests
         var multipartFormDataFactory = new MultipartFormDataFactory(false);
         var request = new
         {
-            File,
+            TestValues.Null,
+            TestValues.File,
+            TestValues.Files,
+            TestValues.String,
+            TestValues.EmptyString,
+            TestValues.Long,
+            TestValues.Int,
+            TestValues.Char,
+            TestValues.Bool,
+            TestValues.Float,
+            TestValues.Double,
+            TestValues.Byte,
+            TestValues.Decimal,
+            TestValues.Guid,
+            TestValues.DateTimeOffset,
+            TestValues.Nulls,
+            TestValues.Strings,
+            TestValues.Longs,
+            TestValues.Ints,
+            TestValues.Chars,
+            TestValues.Bools,
+            TestValues.Floats,
+            TestValues.Doubles,
+            TestValues.Bytes,
+            TestValues.Decimals,
+            TestValues.Guids,
+            TestValues.DateTimeOffsets,
+            TestValues.EmptyStrings,
         };
 
         var results =
