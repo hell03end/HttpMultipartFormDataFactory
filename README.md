@@ -5,20 +5,26 @@
 
 A small library for creating multipart/form-data content from flat structure objects.
 
-This project is licensed under the [MIT license](LICENSE).
-
 ## Usage
 
-Create an instance of the HttpMultipartFormDataFactory class, then pass it a request object:
+Create an instance of the MultipartFormDataFactory class or use `MultipartFormDataFactory.Default` static field, then pass it a request object:
 
 ```cs
-var multipartFormDataFactory = new HttpMultipartFormDataFactory();
-var format = await multipartFormDataFactory.Create(factory, token);
+var multipartFormDataFactory = new MultipartFormDataFactory();
+var content = await multipartFormDataFactory.Create(factory, token);
 ```
 
-This will return a System.Net.Http.MultipartFormDataContent instance.
+This will return a System.Net.Http.MultipartFormDataContent instance. Later is can be used in http client instance like this:
+
+```cs
+var response = await _httpClient.PostAsync(url, content, token);
+```
 
 ## Benchmarks
+
+```sh
+dotnet run -c RELEASE --project HttpMultipartFormDataFactory.Tests
+```
 
 |             Method |     Mean |    Error |   StdDev |    Gen 0 |    Gen 1 | Allocated |
 |------------------- |---------:|---------:|---------:|---------:|---------:|----------:|
