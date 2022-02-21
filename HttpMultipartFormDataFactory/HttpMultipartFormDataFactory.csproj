@@ -7,9 +7,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
-        <Description>A small library for creating multipart/form-data content from flat structure objects.</Description>
+        <Description>A small library for creating multipart/form-data content from flat objects.</Description>
         <Authors>Dmitry Pchelkin</Authors>
-        <Copyright>(c) Dmitry Pchelkin 2022</Copyright>
+        <Copyright>Dmitry Pchelkin</Copyright>
         <AssemblyName>HttpMultipartFormDataFactory</AssemblyName>
         <PackageId>HttpMultipartFormDataFactory</PackageId>
         <PackageTags>Multipart Form-Data Http</PackageTags>

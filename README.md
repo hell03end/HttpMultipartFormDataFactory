@@ -3,7 +3,7 @@
 [![build](https://github.com/hell03end/HttpMultipartFormDataFactory/actions/workflows/build.yml/badge.svg)](https://github.com/hell03end/HttpMultipartFormDataFactory/actions/workflows/build.yml)
 [![NuGet version](https://badge.fury.io/nu/HttpMultipartFormDataFactory.svg)](https://badge.fury.io/nu/HttpMultipartFormDataFactory)
 
-A small library for creating multipart/form-data content from flat structure objects.
+A small library for creating multipart/form-data content from flat objects.
 
 ## Usage
 
@@ -11,7 +11,7 @@ Create an instance of the MultipartFormDataFactory class or use `MultipartFormDa
 
 ```cs
 var multipartFormDataFactory = new MultipartFormDataFactory();
-var content = await multipartFormDataFactory.Create(factory, token);
+var content = await multipartFormDataFactory.Create(request, token);
 ```
 
 This will return a System.Net.Http.MultipartFormDataContent instance. Later is can be used in http client instance like this:
@@ -19,6 +19,8 @@ This will return a System.Net.Http.MultipartFormDataContent instance. Later is c
 ```cs
 var response = await _httpClient.PostAsync(url, content, token);
 ```
+
+`IFormFile` abstraction should be used for files.
 
 ## Benchmarks
 
