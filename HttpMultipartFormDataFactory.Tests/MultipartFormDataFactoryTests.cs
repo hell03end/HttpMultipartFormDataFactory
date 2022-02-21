@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,7 +17,7 @@ public class MultipartFormDataFactoryTests
     private static MultipartFormDataFactory MultipartFormDataFactory { get; } = MultipartFormDataFactory.Default;
 
     [TestMethod]
-    public async Task MultipartDataContentCreatedNull()
+    public async Task MultipartDataContentCreatedFromNull()
     {
         var request = new
         {
@@ -29,7 +31,7 @@ public class MultipartFormDataFactoryTests
     }
 
     [TestMethod]
-    public async Task MultipartDataContentCreatedSingleFile()
+    public async Task MultipartDataContentCreatedFromSingleFile()
     {
         var request = new
         {
@@ -40,11 +42,11 @@ public class MultipartFormDataFactoryTests
 
         Assert.IsNotNull(content);
         Assert.IsTrue(content.Any());
-        Assert.IsTrue(content.Any(x => x.Headers.Any(h => h.Value.First().Contains($"name={nameof(File)}"))));
+        Assert.IsTrue(content.Any(x => CheckHeadersContains(x, nameof(File))));
     }
 
     [TestMethod]
-    public async Task MultipartDataContentCreatedMultipleFile()
+    public async Task MultipartDataContentCreatedFromMultipleFiles()
     {
         var request = new
         {
@@ -55,11 +57,11 @@ public class MultipartFormDataFactoryTests
 
         Assert.IsNotNull(content);
         Assert.IsTrue(content.Any());
-        Assert.IsTrue(content.All(x => x.Headers.Any(h => h.Value.First().Contains($"name={nameof(File)}"))));
+        Assert.IsTrue(content.All(x => CheckHeadersContains(x, nameof(File))));
     }
 
     [TestMethod]
-    public async Task MultipartDataContentCreated()
+    public async Task MultipartDataContentCreatedFromSingleValues()
     {
         var request = new
         {
@@ -82,15 +84,13 @@ public class MultipartFormDataFactoryTests
         Assert.IsNotNull(content);
         Assert.IsTrue(content.Any());
 
-        var names = request.GetType().GetProperties()
-            .Select(x => x.Name)
-            .ToArray();
+        var names = GetNames(request, true);
 
-        Assert.IsTrue(names.All(n => content.Any(x => x.Headers.Any(h => h.Value.First().Contains($"name={n}")))));
+        Assert.IsTrue(names.All(n => content.Any(x => CheckHeadersContains(x, n))));
     }
 
     [TestMethod]
-    public async Task MultipartDataContentCreatedCollections()
+    public async Task MultipartDataContentCreatedFromCollections()
     {
         var request = new
         {
@@ -114,15 +114,13 @@ public class MultipartFormDataFactoryTests
         Assert.IsNotNull(content);
         Assert.IsTrue(content.Any());
 
-        var names = request.GetType().GetProperties()
-            .Select(x => x.Name)
-            .ToArray();
+        var names = GetNames(request, true);
 
-        Assert.IsTrue(names.All(n => content.Any(x => x.Headers.Any(h => h.Value.First().Contains($"name={n}")))));
+        Assert.IsTrue(names.All(n => content.Any(x => CheckHeadersContains(x, n))));
     }
 
     [TestMethod]
-    public async Task MultipartDataContentCreatedMixed()
+    public async Task MultipartDataContentCreatedFromMixed()
     {
         var request = new
         {
@@ -161,16 +159,13 @@ public class MultipartFormDataFactoryTests
         Assert.IsNotNull(content);
         Assert.IsTrue(content.Any());
 
-        var names = request.GetType().GetProperties()
-            .Select(x => x.Name)
-            .Where(x => !x.Equals(nameof(TestValues.Null), StringComparison.OrdinalIgnoreCase))
-            .ToArray();
+        var names = GetNames(request, false);
 
-        Assert.IsTrue(names.All(n => content.Any(x => x.Headers.Any(h => h.Value.First().Contains($"name={n}")))));
+        Assert.IsTrue(names.All(n => content.Any(x => CheckHeadersContains(x, n))));
     }
 
     [TestMethod]
-    public async Task MultipartDataContentWithCacheNotFail()
+    public async Task MultipartDataContentCreatedWithCacheNotFail()
     {
         var multipartFormDataFactory = new MultipartFormDataFactory();
         var request = new
@@ -212,12 +207,15 @@ public class MultipartFormDataFactoryTests
         {
             Assert.IsNotNull(content);
             Assert.IsTrue(content.Any());
-            Assert.IsTrue(content.Any(x => x.Headers.Any(h => h.Value.First().Contains($"name={nameof(File)}"))));
+
+            var names = GetNames(request, false);
+
+            Assert.IsTrue(names.All(n => content.Any(x => CheckHeadersContains(x, n))));
         }
     }
 
     [TestMethod]
-    public async Task MultipartDataContentWithoutCacheNotFail()
+    public async Task MultipartDataContentCreatedWithoutCacheNotFail()
     {
         var multipartFormDataFactory = new MultipartFormDataFactory(false);
         var request = new
@@ -259,7 +257,21 @@ public class MultipartFormDataFactoryTests
         {
             Assert.IsNotNull(content);
             Assert.IsTrue(content.Any());
-            Assert.IsTrue(content.Any(x => x.Headers.Any(h => h.Value.First().Contains($"name={nameof(File)}"))));
+
+            var names = GetNames(request, false);
+
+            Assert.IsTrue(names.All(n => content.Any(x => CheckHeadersContains(x, n))));
         }
     }
+
+    private static bool CheckHeadersContains(HttpContent content, string value) =>
+        content.Headers.Any(h => CheckHeadersContains(h, value));
+
+    private static bool CheckHeadersContains(KeyValuePair<string, IEnumerable<string>> headers, string value) =>
+        headers.Value.Any(x => x.Contains($"name={value}"));
+
+    private static string[] GetNames(object request, bool withNulls) => request.GetType().GetProperties()
+        .Select(x => x.Name)
+        .Where(x => withNulls || !x.Equals(nameof(TestValues.Null), StringComparison.OrdinalIgnoreCase))
+        .ToArray();
 }
